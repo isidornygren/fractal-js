@@ -3,7 +3,6 @@
 function mandelbrot(real, imaginary){
   var max = 127; // maximum number of iterations
 
-  //console.log(real + ", " + imaginary)
   var z_real = real;
   var z_imaginary = imaginary;
   var counter = 0;
@@ -15,7 +14,7 @@ function mandelbrot(real, imaginary){
 
   // worker event
   onmessage = function(event) {
-    console.log("Message recieved to worker: " + event.data[0] + ", " + event.data[1] + ", id: " + id);
+    console.log("[" + id + "] Recieved: " + event.data[0] + ", " + event.data[1]);
     var canvasWidth = event.data[2];
     var canvasHeight = event.data[3];
     var x = event.data[4];
@@ -24,9 +23,12 @@ function mandelbrot(real, imaginary){
     var ratio = canvasWidth/canvasHeight;
     var scaling = Math.max(canvasWidth, canvasHeight)/4;
 
+    var startPos = event.data[0];
+    var endPos = event.data[1];
+
     var array = [];
 
-    for (var i=event.data[0]; i < event.data[1] ; i+=4){
+    for (var i= startPos; i < endPos ; i+=4){
       // console.log(i)
       // Calculate current position of image data
       var row = Math.floor(i/(4*canvasWidth));
@@ -39,16 +41,17 @@ function mandelbrot(real, imaginary){
       // var color = mandelbrot(row_p - 0.5,1*ratio - column_p*ratio);
       var color = mandelbrot((column_p-0.5)*2*ratio/z + x/scaling, (row_p-0.5)*2/z + y/scaling);
 
+      //TODO should just return an iteration number
       array[i] = color[0];
       array[i + 1] = color[1];
       array[i + 2] = color[2];
-      array[i + 3] = 255;
+      array[i + 3] = 255; //TODO unnessecary
     }
     // chunk ready, post it
-    var height = Math.floor((event.data[1] - event.data[0])/(4*canvasWidth));
-    var position = Math.floor((event.data[0])/(4*canvasWidth));
+    var height = Math.floor((endPos - startPos)/(4*canvasWidth));
+    var position = Math.floor((startPos)/(4*canvasWidth));
     console.log("[" + id + "] Height: " + height);
-    postMessage([array, event.data[0], event.data[1], height, position]);
+    postMessage([array, startPos, endPos, height, position]);
   }
 
   getColor = function(iteration, max){

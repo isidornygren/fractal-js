@@ -46,12 +46,18 @@ function draw(){
       worker.onmessage = function(event){
         console.log("Message recieved");
         var tempImage = ctx.createImageData(canvasWidth, event.data[3]);
-        for(var j = 0; j < (event.data[2] - event.data[1]); j+=4){
-          var pos = j + event.data[1];
-          tempImage.data[j] = event.data[0][pos];
-          tempImage.data[j + 1] = event.data[0][pos + 1];
-          tempImage.data[j + 2] = event.data[0][pos + 2];
-          tempImage.data[j + 3] = event.data[0][pos + 3];
+        var startPos = event.data[1];
+        var endPos = event.data[2];
+        var arrayLength = endPos - startPos;
+
+        var imageArray = event.data[0];
+
+        for(var j = 0; j < arrayLength; j+=4){
+          var pos = j + startPos;
+          tempImage.data[j] = imageArray[pos];
+          tempImage.data[j + 1] = imageArray[pos + 1];
+          tempImage.data[j + 2] = imageArray[pos + 2];
+          tempImage.data[j + 3] = imageArray[pos + 3];
         }
         //imageData.data[event.data[0] = event.data[1];
         // write it to the canvas
