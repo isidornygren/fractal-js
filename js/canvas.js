@@ -49,7 +49,6 @@ function draw(){
         var startPos = event.data[1];
         var endPos = event.data[2];
         var arrayLength = endPos - startPos;
-
         var imageArray = event.data[0];
 
         for(var j = 0; j < arrayLength; j+=4){
