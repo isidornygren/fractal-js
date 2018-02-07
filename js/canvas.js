@@ -8,29 +8,34 @@ var y = 0;
 var z = 1; // scaling
 
 var workers = [];
-var worker_count = 16;
+var worker_count = 4;
 
 for (var i = 0; i < worker_count ; i++){
-  var worker = new Worker(URL.createObjectURL(new Blob(["("+mandelbrot.toString()+")()"], {type: 'text/javascript'})));
+  var worker = newWorker();
   workers.push(worker);
+}
+
+function newWorker(){
+  return new Worker(URL.createObjectURL(new Blob(["("+mandelbrot_worker.toString()+")()"], {type: 'text/javascript'})));
 }
 
 // Redraws the canvas
 function draw(){
+  var d = new Date();
+  var startTime = d.getTime();
+  var returns = 0;
   // Create a blank image
   var imageData = ctx.createImageData(canvasWidth, canvasHeight);
 
-  var d = new Date();
-  var startTime = d.getTime();
-
   // If the browser can handle workers
-  if (window.Worker) {
+  if (true) {
     var image_length = imageData.data.length;
     var tot = 0;
     // Loop through workers and initiate new
     for (var i = 0; i < worker_count ; i++){
       var step = 0
       if (i == worker_count - 1){
+        // add the last lines to the last worker
         step = image_length - tot
       }else{
         step = (image_length/(worker_count)) - (image_length/(worker_count))%(canvasWidth*4)
@@ -39,7 +44,7 @@ function draw(){
       var worker = workers[i];
       // If the worker is already working then stop that worker
       worker.terminate();
-      worker = new Worker(URL.createObjectURL(new Blob(["("+mandelbrot.toString()+")()"], {type: 'text/javascript'})));
+      worker = newWorker();
       workers[i] = worker;
 
       worker.postMessage([tot, tot + step, canvasWidth, canvasHeight, x, y, z]);
@@ -48,17 +53,26 @@ function draw(){
         var startPos = event.data[1];
         var endPos = event.data[2];
         var arrayLength = endPos - startPos;
-        var imageArray = event.data[0];
+        var fractalArray = event.data[0];
 
-        for(var j = 0; j < arrayLength; j+=4){
-          tempImage.data[j] = imageArray[j];
-          tempImage.data[j + 1] = imageArray[j + 1];
-          tempImage.data[j + 2] = imageArray[j + 2];
-          tempImage.data[j + 3] = imageArray[j + 3];
+        for(var j = 0; j < arrayLength/4; j++){
+          var color = getColor(fractalArray[j])
+          tempImage.data[j*4] = color[0];
+          tempImage.data[j*4 + 1] = color[1];
+          tempImage.data[j*4 + 2] = color[2];
+          tempImage.data[j*4 + 3] = 255;
         }
         //imageData.data[event.data[0] = event.data[1];
         // write it to the canvas
         ctx.putImageData(tempImage,0,event.data[4]);
+        // Write draw time to canvas
+        returns++;
+        if(returns == worker_count){
+          // update deltatime
+          var e = new Date();
+          var time = e.getTime() - startTime;
+          ctx.fillText("Time since draw: " + time + "ms", 10,20)
+        }
       }
 
       tot += step;
@@ -87,12 +101,11 @@ function draw(){
     }
     // Write it to the canvas
     ctx.putImageData(imageData,0,0);
+    // update deltatime
+    var e = new Date();
+    var time = e.getTime() - startTime;
+    ctx.fillText("Time since draw: " + time + "ms", 10,20)
   }
-  // Calculate time it took to draw
-  var e = new Date();
-  var time = e.getTime() - startTime;
-  // Write draw time to canvas
-  ctx.fillText("Time: " + time + "ms", 10,20)
 }
 
 // Reset the dimensions on window resize
