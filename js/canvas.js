@@ -62,7 +62,6 @@ function draw(){
           tempImage.data[j*4 + 2] = color[2];
           tempImage.data[j*4 + 3] = 255;
         }
-        //imageData.data[event.data[0] = event.data[1];
         // write it to the canvas
         ctx.putImageData(tempImage,0,event.data[4]);
         // Write draw time to canvas
