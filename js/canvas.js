@@ -57,7 +57,7 @@ function draw(){
   var imageData = ctx.createImageData(canvasWidth, canvasHeight);
 
   // If the browser can handle workers
-  if (true) {
+  if (window.Worker) {
     var image_length = imageData.data.length;
     var tot = 0;
     // Loop through workers and initiate new
@@ -78,7 +78,7 @@ function draw(){
 
       worker.postMessage([tot, tot + step, canvasWidth, canvasHeight, x, y, z]);
       worker.onmessage = function(event){
-        var tempImage = ctx.createImageData(canvasWidth, event.data[3]);
+        //var tempImage = ctx.createImageData(canvasWidth, event.data[3]);
         var startPos = event.data[1];
         var endPos = event.data[2];
         var arrayLength = endPos - startPos;
@@ -86,14 +86,8 @@ function draw(){
 
         for(var j = 0; j < arrayLength/4; j++){
           iterationArray[j + startPos/4] = fractalArray[j];
-          var color = getColor(fractalArray[j])
-          tempImage.data[j*4] = color[0];
-          tempImage.data[j*4 + 1] = color[1];
-          tempImage.data[j*4 + 2] = color[2];
-          tempImage.data[j*4 + 3] = 255;
         }
         // write it to the canvas
-        ctx.putImageData(tempImage,0,event.data[4]);
         // Write draw time to canvas
         returns++;
         if(returns == worker_count){
