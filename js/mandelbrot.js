@@ -24,11 +24,13 @@ function mandelbrot(){
 
     var array = [];
 
-    for (var i= startPos; i < endPos ; i+=4){
+    for (var i = 0; i < (endPos - startPos); i+=4){
       // console.log(i)
       // Calculate current position of image data
-      var row = Math.floor(i/(4*canvasWidth));
-      var column = Math.floor(i/4 - row*canvasWidth);
+      var absolutePos = i + startPos;
+
+      var row = Math.floor(absolutePos/(4*canvasWidth));
+      var column = Math.floor(absolutePos/4 - row*canvasWidth);
 
       // Calculate percentages of row / column 0-1
       var row_p = (1 + row)/canvasHeight;
@@ -45,7 +47,9 @@ function mandelbrot(){
     }
     // chunk ready, post it
     var height = Math.floor((endPos - startPos)/(4*canvasWidth));
+
     var position = Math.floor((startPos)/(4*canvasWidth));
+
     console.log("[" + id + "] Height: " + height);
     postMessage([array, startPos, endPos, height, position]);
   }

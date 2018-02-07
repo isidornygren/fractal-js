@@ -8,7 +8,7 @@ var y = 0;
 var z = 1; // scaling
 
 var workers = [];
-var worker_count = 5;
+var worker_count = 16;
 
 for (var i = 0; i < worker_count ; i++){
   var worker = new Worker(URL.createObjectURL(new Blob(["("+mandelbrot.toString()+")()"], {type: 'text/javascript'})));
@@ -27,15 +27,15 @@ function draw(){
   if (window.Worker) {
     var image_length = imageData.data.length;
     var tot = 0;
-    // Loop trought workers
+    // Loop through workers and initiate new
     for (var i = 0; i < worker_count ; i++){
-      console.log(i)
       var step = 0
       if (i == worker_count - 1){
         step = image_length - tot
       }else{
-        step = (image_length/worker_count) - (image_length/worker_count)%4
+        step = (image_length/(worker_count)) - (image_length/(worker_count))%(canvasWidth*4)
       }
+
       var worker = workers[i];
       // If the worker is already working then stop that worker
       worker.terminate();
@@ -44,7 +44,6 @@ function draw(){
 
       worker.postMessage([tot, tot + step, canvasWidth, canvasHeight, x, y, z]);
       worker.onmessage = function(event){
-        console.log("Message recieved");
         var tempImage = ctx.createImageData(canvasWidth, event.data[3]);
         var startPos = event.data[1];
         var endPos = event.data[2];
@@ -52,11 +51,10 @@ function draw(){
         var imageArray = event.data[0];
 
         for(var j = 0; j < arrayLength; j+=4){
-          var pos = j + startPos;
-          tempImage.data[j] = imageArray[pos];
-          tempImage.data[j + 1] = imageArray[pos + 1];
-          tempImage.data[j + 2] = imageArray[pos + 2];
-          tempImage.data[j + 3] = imageArray[pos + 3];
+          tempImage.data[j] = imageArray[j];
+          tempImage.data[j + 1] = imageArray[j + 1];
+          tempImage.data[j + 2] = imageArray[j + 2];
+          tempImage.data[j + 3] = imageArray[j + 3];
         }
         //imageData.data[event.data[0] = event.data[1];
         // write it to the canvas
