@@ -7,8 +7,13 @@ var x = 0;
 var y = 0;
 var z = 1; // scaling
 
+var date = new Date();
+var initTime = date.getTime();
+
 var workers = [];
 var worker_count = 4;
+
+var iterationArray = [];
 
 for (var i = 0; i < worker_count ; i++){
   var worker = newWorker();
@@ -17,6 +22,30 @@ for (var i = 0; i < worker_count ; i++){
 
 function newWorker(){
   return new Worker(URL.createObjectURL(new Blob(["("+mandelbrot_worker.toString()+")()"], {type: 'text/javascript'})));
+
+}
+setInterval(function(){
+    drawRainBow();
+}, 40);
+// Draws a beautiful rainbow version of the mandelbrot
+function drawRainBow(){
+  var tempImage = ctx.createImageData(canvasWidth, canvasHeight);
+  var arrayLength = iterationArray.length;
+
+  var date = new Date();
+  var time = Math.floor((date.getTime() - initTime)/50);
+  console.log(time)
+
+  for(var j = 0; j < arrayLength; j++){
+    var delta = (iterationArray[j] + time) % (max);
+    //console.log(delta)
+    var color = getColor(delta);
+    tempImage.data[j*4] = color[0];
+    tempImage.data[j*4 + 1] = color[1];
+    tempImage.data[j*4 + 2] = color[2];
+    tempImage.data[j*4 + 3] = 255;
+  }
+  ctx.putImageData(tempImage,0,0);
 }
 
 // Redraws the canvas
@@ -56,6 +85,7 @@ function draw(){
         var fractalArray = event.data[0];
 
         for(var j = 0; j < arrayLength/4; j++){
+          iterationArray[j + startPos/4] = fractalArray[j];
           var color = getColor(fractalArray[j])
           tempImage.data[j*4] = color[0];
           tempImage.data[j*4 + 1] = color[1];
@@ -111,6 +141,7 @@ function draw(){
 window.onresize = function(event) {
   canvasWidth = window.innerWidth;
   canvasHeight = window.innerHeight;
+  var iterationArray = [];
 
   // Set the size of the canvas
   canvas.width = canvasWidth;

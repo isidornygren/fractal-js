@@ -17,7 +17,7 @@ for(var i = Math.ceil((max + 1)/3); i < Math.ceil(2*(max + 1)/3); i++){
 }
 for(var i = Math.ceil(2*(max + 1)/3); i < (max + 1); i++){
   var localStart = Math.ceil(2*(max + 1)/3);
-  var localMax = (max + 1)
+  var localMax = Math.ceil((max + 1)/3);
   var color = [255*((i - localStart)/localMax),0,255 - 255*((i - localStart)/localMax),255];
   colors[i] = color;
 }
