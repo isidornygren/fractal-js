@@ -1,5 +1,5 @@
 "use strict";
-var max = 128; // maximum number of iterations
+var max = 256; // maximum number of iterations
 var colors = [];
 colors[-1] = [0,0,0];
 

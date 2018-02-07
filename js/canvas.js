@@ -33,7 +33,7 @@ function drawRainBow(){
   var arrayLength = iterationArray.length;
 
   var date = new Date();
-  var time = Math.floor((date.getTime() - initTime)/50);
+  var time = Math.floor((date.getTime() - initTime)*max/10000);
   console.log(time)
 
   for(var j = 0; j < arrayLength; j++){
