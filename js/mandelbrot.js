@@ -18,9 +18,11 @@ function mandelbrot(real, imaginary){
     console.log("Message recieved to worker: " + event.data[0] + ", " + event.data[1] + ", id: " + id);
     var canvasWidth = event.data[2];
     var canvasHeight = event.data[3];
-    var x = event.data[4]
-    var y = event.data[5]
-    var z = event.data[6]
+    var x = event.data[4];
+    var y = event.data[5];
+    var z = event.data[6];
+    var ratio = canvasWidth/canvasHeight;
+    var scaling = Math.max(canvasWidth, canvasHeight)/4;
 
     var array = [];
 
@@ -34,10 +36,7 @@ function mandelbrot(real, imaginary){
       var row_p = (1 + row)/canvasHeight;
       var column_p = (1 + column)/canvasWidth;
 
-      //TODO this produces a fliped set
-      var ratio = canvasWidth/canvasHeight
       // var color = mandelbrot(row_p - 0.5,1*ratio - column_p*ratio);
-      var scaling = Math.max(canvasWidth, canvasHeight)/4
       var color = mandelbrot((column_p-0.5)*2*ratio/z + x/scaling, (row_p-0.5)*2/z + y/scaling);
 
       array[i] = color[0];
